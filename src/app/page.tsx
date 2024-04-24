@@ -1,41 +1,62 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "./_components/ui/card";
+"use client";
 
-export default async function Home() {
+import { api } from "~/trpc/react";
+import { Moment } from "./_components/moment";
+import { Button } from "./_components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "./_components/ui/dialog";
+import { useState } from "react";
+
+export default function Home() {
+  const { data: moments } = api.post.getLatest.useQuery();
+  const { mutate: createMoment } = api.post.create.useMutation({
+    onSettled: () => setMomentText(""),
+  });
+  const [momentText, setMomentText] = useState("");
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center">
-      <div className="flex flex-col gap-2 max-w-md">
-        <Moment />
-        <Moment />
-        <Moment />
+    <main className="mx-4 my-2 flex min-h-screen max-w-lg flex-col items-center justify-start gap-4">
+      <div className="flex flex-col gap-2">
+        <div className="h-72 w-48 rounded-md bg-slate-200"></div>
+        <p>Lorem ipsum dolor sit amet.</p>
+      </div>
+      <Dialog>
+        <DialogTrigger asChild>
+          <div className="flex w-full justify-start">
+            <Button variant="default">Add Moment</Button>
+          </div>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Create Moment</DialogTitle>
+          </DialogHeader>
+          <textarea
+            onChange={(e) => setMomentText(e.target.value)}
+            name=""
+            id=""
+            cols={10}
+            rows={10}
+          ></textarea>
+          <DialogFooter>
+            <Button
+              onClick={() => createMoment({ name: momentText })}
+              type="submit"
+            >
+              Save
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <div className="flex flex-col gap-2">
+        {moments?.map((m) => <Moment name={m.name} key={m.id} />)}
       </div>
     </main>
-  );
-}
-
-function Moment() {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Example Post</CardTitle>
-        <CardDescription>150/300</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <p>
-          Lorem ipsum dolor sit amet consectetur, adipisicing elit. Saepe,
-          commodi eius autem atque, quo illo accusamus quod quasi ratione velit
-          delectus unde fuga porro numquam!
-        </p>
-      </CardContent>
-      <CardFooter>
-        <p>username</p>
-      </CardFooter>
-    </Card>
   );
 }

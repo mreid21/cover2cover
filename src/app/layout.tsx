@@ -1,8 +1,8 @@
 import "~/styles/globals.css";
 
 import { Inter } from "next/font/google";
-
 import { TRPCReactProvider } from "~/trpc/react";
+import { Avatar, AvatarFallback } from "./_components/ui/avatar";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -23,7 +23,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`font-sans ${inter.variable}`}>
-        <TRPCReactProvider>{children}</TRPCReactProvider>
+        <TRPCReactProvider>
+          <div className="flex items-center justify-end p-4 border-b">
+            <Avatar>
+              <AvatarFallback>CN</AvatarFallback>
+            </Avatar>
+          </div>
+          {children}
+        </TRPCReactProvider>
       </body>
     </html>
   );
