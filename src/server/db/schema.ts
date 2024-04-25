@@ -2,6 +2,7 @@ import { relations, sql } from "drizzle-orm";
 import {
   index,
   integer,
+  pgTable,
   pgTableCreator,
   primaryKey,
   serial,
@@ -31,6 +32,7 @@ export const users = createTable("user", {
 
 export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
+  chaptersRead: many(chaptersReadBy)
 }));
 
 export const accounts = createTable(
@@ -107,4 +109,23 @@ export const moments = createTable("moments", {
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
   updatedAt: timestamp("updatedAt"),
+});
+
+
+export const chapters = createTable("chapter", {
+  id: serial("id").primaryKey(),
+  number: integer('number').notNull(),
+})
+
+export const chapterRelations = relations(chapters, ({ many }) => ({
+  readBy: many(chaptersReadBy)
+}));
+
+export const chaptersReadBy = pgTable("chapters_read_by", {
+  chapterId: integer("chapter_id").references(() => chapters.id),
+  userId: varchar("user_id", {length: 255}).references(() => users.id),
+}, (table) => {
+  return {
+    pk: primaryKey({ columns: [table.chapterId, table.userId] }),
+  };
 });

@@ -1,13 +1,13 @@
-import { Chapter } from "../_components/chapter";
+import { notFound } from "next/navigation";
+import { getServerAuthSession } from "~/server/auth";
+import { ChapterList } from "../_components/chapter-list";
 
-export default function BookPage() {
+export default async function BookPage() {
+  const session = await getServerAuthSession();
+  if (!session?.user) notFound();
+
   return (
-    <div className="mx-auto my-4 flex max-w-xl flex-col gap-2">
-      <Chapter number={1} />
-      <Chapter number={2}/>
-      <Chapter number={3} locked />
-      <Chapter number={4} locked />
-    </div>
+    <ChapterList userId={session.user.id}/>
   );
 }
 

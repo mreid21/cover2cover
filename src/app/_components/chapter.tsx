@@ -4,6 +4,8 @@ import { type VariantProps, cva } from "class-variance-authority";
 import { Button } from "./ui/button";
 import { Check } from "lucide-react";
 import Link from "next/link";
+import { api } from "~/trpc/react";
+import { useRouter } from "next/navigation";
 
 const chapterVariants = cva(
   "flex text-sm justify-between min-h-16 items-center shadow rounded-md p-4",
@@ -18,13 +20,23 @@ const chapterVariants = cva(
 );
 
 type ChapterProps = VariantProps<typeof chapterVariants> & {
+  id: number;
   number: number;
+  userId: string;
 };
 
-export function Chapter({ number, locked = false }: ChapterProps) {
+export function Chapter({ id, number, userId, locked = false }: ChapterProps) {
+  const router = useRouter();
+  const { mutate: readChapter } = api.moment.markChapter.useMutation({
+    onSuccess: () => {
+      router.refresh()
+    },
+  });
+
   const markRead = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     e.preventDefault();
+    readChapter({ chapterId: id, userId });
   };
 
   return (
