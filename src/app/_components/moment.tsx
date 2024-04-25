@@ -1,7 +1,6 @@
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { Ellipsis } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { Separator } from "./ui/separator";
 import { api } from "~/trpc/react";
 
 type MomentProps = {
@@ -16,7 +15,7 @@ export function Moment({ id, content }: MomentProps) {
     onSuccess: () => utils.moment.getForChapter.invalidate(),
   });
   return (
-    <div className="max-w-fit rounded-xl border bg-card p-4 text-card-foreground shadow">
+    <div className="max-w-fit min-w-[300px] rounded-xl border bg-card p-4 text-card-foreground shadow">
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
@@ -32,10 +31,9 @@ export function Moment({ id, content }: MomentProps) {
               </div>
             </PopoverTrigger>
             <PopoverContent align="start">
-              <ul className="cursor-pointer text-sm">
-                <li className="my-1">Edit</li>
-                <Separator />
-                <li onClick={() => deleteMoment({id})} className="my-1">Delete</li>
+              <ul className="cursor-pointer grid gap-1 text-sm">
+                <li className="hover:bg-secondary p-1.5 rounded-md">Edit</li>
+                <li className="hover:bg-secondary p-1.5 rounded-md" onClick={() => deleteMoment({id})}>Delete</li>
               </ul>
             </PopoverContent>
           </Popover>
