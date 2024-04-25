@@ -41,7 +41,7 @@ export function Chapter({ id, number, userId, locked = false }: ChapterProps) {
 
   return (
     <Link
-      href={`/?chapter=${number}`}
+      href={`/book/chapter?number=${number}`}
       aria-disabled={locked!}
       tabIndex={locked ? -1 : 0}
       className={chapterVariants({ locked })}
