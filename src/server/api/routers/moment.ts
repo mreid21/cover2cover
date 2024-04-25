@@ -1,29 +1,34 @@
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { moments } from "~/server/db/schema";
-import { api } from "~/trpc/server";
 
-export const postRouter = createTRPCRouter({
+export const momentRouter = createTRPCRouter({
   create: publicProcedure
-    .input(z.object({ name: z.string().min(1), content: z.string().min(1) }))
+    .input(z.object({ chapter: z.number(), content: z.string().min(1) }))
     .mutation(async ({ ctx, input }) => {
       // simulate a slow db call
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       await ctx.db.insert(moments).values({
-        name: input.name,
+        chapter: input.chapter,
         content: input.content,
       });
     }),
-  delete: publicProcedure.input(z.object({id: z.number()})).mutation(async ({ctx, input}) => {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      await ctx.db.delete(moments).where(eq(moments.id, input.id))
-  }),
-
+  delete: publicProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.delete(moments).where(eq(moments.id, input.id));
+    }),
+  getForChapter: publicProcedure
+    .input(z.object({ chapter: z.number() }))
+    .query(({ ctx, input }) => {
+      return ctx.db.query.moments.findMany({
+        where: eq(moments.chapter, input.chapter),
+      });
+    }),
   getLatest: publicProcedure.query(async ({ ctx }) => {
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 200));
     return ctx.db.query.moments.findMany({
       orderBy: (posts, { asc }) => [asc(posts.createdAt)],
       limit: 10,

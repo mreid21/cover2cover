@@ -98,7 +98,7 @@ export const verificationTokens = createTable(
 
 export const moments = createTable("moments", {
   id: serial("id").primaryKey(),
-  name: varchar("name", { length: 256 }).notNull(),
+  chapter: integer('chapter').notNull(),
   content: text('content').notNull(),
   createdById: varchar("createdById", { length: 255 }).references(
     () => users.id,

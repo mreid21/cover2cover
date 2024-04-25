@@ -12,11 +12,15 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 
-export default function CreateMoment() {
+type CreateMomentProps = {
+    chapter: number
+}
+
+export default function CreateMoment({chapter}: CreateMomentProps) {
   const utils = api.useUtils();
-  const { mutate: createMoment } = api.post.create.useMutation({
+  const { mutate: createMoment } = api.moment.create.useMutation({
     onSettled: () => setMomentText(""),
-    onSuccess: () => utils.post.getLatest.invalidate(),
+    onSuccess: () => utils.moment.getForChapter.invalidate(),
   });
   const [momentText, setMomentText] = useState("");
   const [open, setOpen] = useState(false);
@@ -41,7 +45,7 @@ export default function CreateMoment() {
         <DialogFooter>
           <Button
             onClick={() => {
-              createMoment({ name: "New Post", content: momentText });
+              createMoment({ chapter, content: momentText });
               setOpen(false);
             }}
             type="submit"

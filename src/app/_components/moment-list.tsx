@@ -4,11 +4,15 @@ import CreateMoment from "./create-moment";
 import { Moment } from "./moment";
 import { Skeleton } from "./ui/skeleton";
 
-export function MomentList() {
-  const { data: moments, isLoading } = api.post.getLatest.useQuery();
+type MomentListProps = {
+  chapter: number
+}
+
+export function MomentList({chapter}: MomentListProps) {
+  const { data: moments, isLoading } = api.moment.getForChapter.useQuery({chapter});
   return (
     <div className="flex flex-col gap-2 max-w-[300px] sm:max-w-[600px]">
-      <CreateMoment />
+      <CreateMoment chapter={chapter} />
       {isLoading && <MomentListSkeleton />}
       {moments?.map((m) => <Moment id={m.id} content={m.content} key={m.id} />)}
     </div>
