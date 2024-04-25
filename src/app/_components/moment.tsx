@@ -1,32 +1,48 @@
-import React from "react";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from "./ui/card";
 import { Avatar, AvatarFallback } from "./ui/avatar";
+import { Ellipsis } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { Separator } from "./ui/separator";
+import { api } from "~/trpc/react";
+import { util } from "zod";
 
-export function Moment({ name, content }: { name: string; content: string }) {
+type MomentProps = {
+  id: number;
+  content: string;
+};
+
+export function Moment({ id, content }: MomentProps) {
+  const utils = api.useUtils();
+
+  const { mutate: deleteMoment } = api.post.delete.useMutation({
+    onSuccess: () => utils.post.getLatest.invalidate(),
+  });
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Example Post</CardTitle>
-        <CardDescription>150/300</CardDescription>
-      </CardHeader>
-      <CardContent className="text">
-        <p>{name}</p>
-      </CardContent>
-      <CardFooter>
-        <div className="flex items-center justify-start gap-2">
-          <Avatar size="sm">
-            <AvatarFallback>CN</AvatarFallback>
-          </Avatar>
-          <p>username</p>
+    <div className="max-w-fit rounded-xl border bg-card p-4 text-card-foreground shadow">
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <Avatar size="sm">
+              <AvatarFallback>CN</AvatarFallback>
+            </Avatar>
+            <span>usernameugh</span>
+          </div>
+          <Popover>
+            <PopoverTrigger>
+              <div className="flex items-center justify-center rounded-xl p-1 hover:shadow">
+                <Ellipsis size={16} />
+              </div>
+            </PopoverTrigger>
+            <PopoverContent align="start">
+              <ul className="cursor-pointer text-sm">
+                <li className="my-1">Edit</li>
+                <Separator />
+                <li onClick={() => deleteMoment({id})} className="my-1">Delete</li>
+              </ul>
+            </PopoverContent>
+          </Popover>
         </div>
-      </CardFooter>
-    </Card>
+        <p className="ml-4 text-wrap">{content}</p>
+      </div>
+    </div>
   );
 }
