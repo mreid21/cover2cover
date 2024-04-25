@@ -1,6 +1,7 @@
 import { momentRouter } from "~/server/api/routers/moment";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 import { chapterRouter } from "./routers/chapter";
+import { clubRouter } from "./routers/club";
 
 /**
  * This is the primary router for your server.
@@ -9,6 +10,7 @@ import { chapterRouter } from "./routers/chapter";
  */
 export const appRouter = createTRPCRouter({
   moment: momentRouter,
+  clubs: clubRouter,
   chapter: chapterRouter
 });
 
