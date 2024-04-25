@@ -1,5 +1,6 @@
 import { momentRouter } from "~/server/api/routers/moment";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
+import { chapterRouter } from "./routers/chapter";
 
 /**
  * This is the primary router for your server.
@@ -8,6 +9,7 @@ import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
  */
 export const appRouter = createTRPCRouter({
   moment: momentRouter,
+  chapter: chapterRouter
 });
 
 // export type definition of API

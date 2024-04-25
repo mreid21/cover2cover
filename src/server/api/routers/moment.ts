@@ -2,10 +2,9 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 import {
   createTRPCRouter,
-  protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-import { chapters, chaptersReadBy, moments } from "~/server/db/schema";
+import { moments } from "~/server/db/schema";
 
 export const momentRouter = createTRPCRouter({
   create: publicProcedure
@@ -38,15 +37,4 @@ export const momentRouter = createTRPCRouter({
       limit: 10,
     });
   }),
-  getChapters: protectedProcedure.query(({ ctx }) => {
-    return ctx.db.select().from(chapters).leftJoin(chaptersReadBy, eq(chaptersReadBy.chapterId, chapters.id))
-  }),
-  markChapter: protectedProcedure
-    .input(z.object({ chapterId: z.number(), userId: z.string() }))
-    .mutation(async ({ ctx, input }) => {
-      await ctx.db.insert(chaptersReadBy).values({
-        userId: ctx.session.user.id,
-        chapterId: input.chapterId,
-      });
-    }),
 });

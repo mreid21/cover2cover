@@ -5,10 +5,11 @@ type ChapterListProps = {
   userId: string;
 };
 export async function ChapterList({ userId }: ChapterListProps) {
-  const chapters = await api.moment.getChapters();
+  const chapters = await api.chapter.getAll({userId});
 
   return (
     <div className="mx-auto my-4 flex max-w-xl flex-col gap-2">
+        {JSON.stringify(chapters)}
       {chapters.map((c) => (
         <Chapter
           id={c.chapter.id}

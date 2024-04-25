@@ -27,7 +27,7 @@ type ChapterProps = VariantProps<typeof chapterVariants> & {
 
 export function Chapter({ id, number, userId, locked = false }: ChapterProps) {
   const router = useRouter();
-  const { mutate: readChapter } = api.moment.markChapter.useMutation({
+  const { mutate: markChapter } = api.chapter.markRead.useMutation({
     onSuccess: () => {
       router.refresh()
     },
@@ -36,7 +36,7 @@ export function Chapter({ id, number, userId, locked = false }: ChapterProps) {
   const markRead = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     e.preventDefault();
-    readChapter({ chapterId: id, userId });
+    markChapter({ chapterId: id, userId });
   };
 
   return (
