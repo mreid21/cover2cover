@@ -18,6 +18,7 @@ async function ChapterList({ userId }: ChapterListProps) {
 
   return (
     <div className="mx-auto my-4 flex max-w-xl flex-col gap-2">
+
       {chapters.map((c) => (
         <Chapter
           id={c.chapter.id}
