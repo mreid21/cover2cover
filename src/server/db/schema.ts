@@ -1,5 +1,6 @@
 import { relations, sql } from "drizzle-orm";
 import {
+  boolean,
   index,
   integer,
   pgTableCreator,
@@ -115,9 +116,10 @@ export const moments = createTable("moments", {
 export const chapters = createTable("chapter", {
   id: serial("id").primaryKey(),
   number: integer('number').notNull(),
+  bookReadingId: integer("book_reading_id").notNull().references(() => bookReading.id)
 })
 
-export const chapterRelations = relations(chapters, ({ many }) => ({
+export const chapterRelations = relations(chapters, ({ many, one }) => ({
   readBy: many(chaptersReadBy)
 }));
 
@@ -136,3 +138,18 @@ export const clubs = createTable("club", {
   name: varchar("name", { length: 255 }).notNull(),
   ownerId: varchar("ownerId", {length: 255}).notNull().references(() => users.id)
 });
+
+export const clubRelations = relations(clubs, ({many}) => ({
+  readings: many(bookReading)
+}))
+
+export const bookReading = createTable("book_reading", {
+  id: serial("id").primaryKey(),
+  current: boolean("current").default(false),
+  name: varchar("name", { length: 255 }).notNull(),
+  clubId: integer("club_id").notNull().unique().references(() => clubs.id)
+})
+
+export const bookReadingRelations = relations(bookReading, ({ many }) => ({
+  chapters: many(chapters)
+}));

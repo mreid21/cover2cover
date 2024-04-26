@@ -15,7 +15,7 @@ type ClubProps = {
 
 export default async function Club({ id, name }: ClubProps) {
   return (
-    <Link href={`./clubs/${id}/book`}>
+    <Link href={`./clubs/${id}`}>
       <Card className="flex min-h-[100px] w-[300px]">
         <CardContent className="relative basis-12 px-2">
           <div className="absolute -left-2 -top-1 h-24 w-16 rounded-md bg-secondary shadow"></div>
