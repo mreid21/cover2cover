@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { MomentList } from "../../_components/moment-list";
+import { MomentList } from '~/app/_components/moment-list';
 
 export default async function Chapter({
   searchParams,

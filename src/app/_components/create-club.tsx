@@ -33,7 +33,7 @@ export default function CreateClub({ userId }: CreateClubProps) {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Create Moment</DialogTitle>
+          <DialogTitle>Create Club</DialogTitle>
         </DialogHeader>
         <Input type="text" onChange={(e) => setClubName(e.target.value)} />
         <DialogFooter>

@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { getServerAuthSession } from "~/server/auth";
 import { api } from "~/trpc/server";
-import { Chapter } from "../_components/chapter";
+import { Chapter } from "~/app/_components/chapter";
 
 export default async function BookPage() {
   const session = await getServerAuthSession();

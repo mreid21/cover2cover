@@ -1,13 +1,7 @@
 import { getServerAuthSession } from "~/server/auth";
 import CreateClub from "./_components/create-club";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "./_components/ui/card";
 import { api } from "~/trpc/server";
+import Club from "./_components/club";
 
 export default async function Home() {
   return (
@@ -28,7 +22,7 @@ async function ClubList() {
         <CreateClub userId={session.user.id} />
         <div className="mx-2 grid gap-4 md:grid-cols-2">
           {clubs.map((c) => (
-            <Club key={c.id} name={c.name} ownerId={c.ownerId} />
+            <Club key={c.id} id={c.id} name={c.name} ownerId={c.ownerId} />
           ))}
         </div>
       </div>
@@ -36,20 +30,4 @@ async function ClubList() {
   );
 }
 
-type ClubProps = {
-  name: string,
-  ownerId: string
-}
-function Club({name}: ClubProps) {
-  return (
-    <Card className="flex min-h-[100px] w-[300px]">
-      <CardContent className="relative basis-12 px-2">
-        <div className="absolute -left-2 -top-1 h-24 w-16 rounded-md bg-secondary shadow"></div>
-      </CardContent>
-      <CardHeader>
-        <CardTitle>{name}</CardTitle>
-        <CardDescription>A cool palce to hang out </CardDescription>
-      </CardHeader>
-    </Card>
-  );
-}
+

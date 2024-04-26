@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { and, eq } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 import { chapters, chaptersReadBy } from "~/server/db/schema";
 
 export const chapterRouter = createTRPCRouter({
@@ -16,7 +16,8 @@ export const chapterRouter = createTRPCRouter({
             eq(chapters.id, chaptersReadBy.chapterId),
             eq(chaptersReadBy.userId, input.userId),
           ),
-        );
+        )
+        .orderBy(asc(chapters.number));
     }),
   markRead: protectedProcedure
     .input(z.object({ chapterId: z.number(), userId: z.string() }))
