@@ -13,14 +13,14 @@ import {
 } from "./ui/dialog";
 
 type CreateMomentProps = {
-    chapter: number
+    chapterId: number
 }
 
-export default function CreateMoment({chapter}: CreateMomentProps) {
+export default function CreateMoment({chapterId}: CreateMomentProps) {
   const utils = api.useUtils();
   const { mutate: createMoment } = api.moment.create.useMutation({
     onSettled: () => setMomentText(""),
-    onSuccess: () => utils.moment.getForChapter.invalidate(),
+    onSuccess: () => utils.chapter.getMoments.invalidate()
   });
   const [momentText, setMomentText] = useState("");
   const [open, setOpen] = useState(false);
@@ -45,7 +45,7 @@ export default function CreateMoment({chapter}: CreateMomentProps) {
         <DialogFooter>
           <Button
             onClick={() => {
-              createMoment({ chapter, content: momentText });
+              createMoment({ chapterId, content: momentText });
               setOpen(false);
             }}
             type="submit"

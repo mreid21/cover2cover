@@ -3,18 +3,19 @@ import { getServerAuthSession } from "~/server/auth";
 import { api } from "~/trpc/server";
 import { Chapter } from "~/app/_components/chapter";
 
-export default async function BookPage() {
+export default async function BookPage({searchParams}: {searchParams: {readingId?: string}}) {
   const session = await getServerAuthSession();
-  if (!session?.user) notFound();
+  if (!session?.user || !searchParams?.readingId) notFound();
 
-  return <ChapterList userId={session.user.id} />;
+  return <ChapterList bookReadingId={parseInt(searchParams.readingId)} userId={session.user.id} />;
 }
 
 type ChapterListProps = {
   userId: string;
+  bookReadingId: number
 };
-async function ChapterList({ userId }: ChapterListProps) {
-  const chapters = await api.chapter.getAll({ userId });
+async function ChapterList({ userId, bookReadingId }: ChapterListProps) {
+  const chapters = await api.chapter.getAll({ userId, bookReadingId });
 
   return (
     <div className="mx-auto my-4 flex max-w-xl flex-col gap-2">

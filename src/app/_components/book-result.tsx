@@ -5,10 +5,12 @@ import type { BookProps } from "./book";
 
 /* eslint-disable @next/next/no-img-element */
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-interface BookResultProps extends BookProps {}
+interface BookResultProps extends Omit<BookProps, 'readingId'> {
+  clubId: number
+}
 
 
-export function BookResult({ title, coverImage }: BookResultProps) {
+export function BookResult({ title, coverImage, clubId }: BookResultProps) {
   const router = useRouter();
   const { mutate: setCurrentlyReading } =
     api.clubs.setCurrentlyReading.useMutation({
@@ -20,7 +22,7 @@ export function BookResult({ title, coverImage }: BookResultProps) {
         setCurrentlyReading({
           name: title,
           coverUrl: coverImage,
-          clubId: 1,
+          clubId,
         })
       }
       className="flex flex-col gap-2"

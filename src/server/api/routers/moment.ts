@@ -8,13 +8,13 @@ import { moments } from "~/server/db/schema";
 
 export const momentRouter = createTRPCRouter({
   create: publicProcedure
-    .input(z.object({ chapter: z.number(), content: z.string().min(1) }))
+    .input(z.object({ chapterId: z.coerce.number(), content: z.string().min(1) }))
     .mutation(async ({ ctx, input }) => {
       // simulate a slow db call
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       await ctx.db.insert(moments).values({
-        chapter: input.chapter,
+        chapterId: input.chapterId,
         content: input.content,
       });
     }),
@@ -27,7 +27,7 @@ export const momentRouter = createTRPCRouter({
     .input(z.object({ chapter: z.number() }))
     .query(({ ctx, input }) => {
       return ctx.db.query.moments.findMany({
-        where: eq(moments.chapter, input.chapter),
+        where: eq(moments.chapterId, input.chapter),
       });
     }),
   getLatest: publicProcedure.query(async ({ ctx }) => {

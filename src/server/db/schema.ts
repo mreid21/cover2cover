@@ -102,7 +102,6 @@ export const verificationTokens = createTable(
 
 export const moments = createTable("moments", {
   id: serial("id").primaryKey(),
-  chapter: integer('chapter').notNull(),
   content: text('content').notNull(),
   createdById: varchar("createdById", { length: 255 }).references(
     () => users.id,
@@ -111,17 +110,26 @@ export const moments = createTable("moments", {
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
   updatedAt: timestamp("updatedAt"),
+  chapterId: integer('chapter_id').references(() => chapters.id).notNull()
 });
+
+export const momentRelations = relations(moments, ({ one }) => ({
+  chapter: one(chapters, {
+    fields: [moments.chapterId],
+    references: [chapters.id],
+  }),
+}));
 
 
 export const chapters = createTable("chapter", {
-  id: serial("id").primaryKey(),
+  id: serial('id').primaryKey().notNull(),
   number: integer('number').notNull(),
   bookReadingId: integer("book_reading_id").notNull().references(() => bookReading.id)
 })
 
 export const chapterRelations = relations(chapters, ({ many }) => ({
-  readBy: many(chaptersReadBy)
+  readBy: many(chaptersReadBy),
+  moments: many(moments)
 }));
 
 export const chaptersReadBy = createTable("chapters_read_by", {

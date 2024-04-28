@@ -5,16 +5,19 @@ import { Moment } from "./moment";
 import { Skeleton } from "./ui/skeleton";
 
 type MomentListProps = {
-  chapter: number
-}
+  chapterId: number;
+};
 
-export function MomentList({chapter}: MomentListProps) {
-  const { data: moments, isLoading } = api.moment.getForChapter.useQuery({chapter});
+export function MomentList({ chapterId }: MomentListProps) {
+  const { data: chapterWithMoments, isLoading } =
+    api.chapter.getMoments.useQuery({ chapterId });
   return (
-    <div className="flex flex-col gap-2 max-w-[300px] sm:max-w-[600px]">
-      <CreateMoment chapter={chapter} />
+    <div className="flex max-w-[300px] flex-col gap-2 sm:max-w-[600px]">
+      <CreateMoment chapterId={chapterId} />
       {isLoading && <MomentListSkeleton />}
-      {moments?.map((m) => <Moment id={m.id} content={m.content} key={m.id} />)}
+      {chapterWithMoments?.moments?.map((m) => (
+        <Moment id={m.id} content={m.content} key={m.id} />
+      ))}
     </div>
   );
 }
@@ -25,7 +28,7 @@ function MomentListSkeleton() {
     <>
       <div className="flex flex-col gap-1">
         {skeletonCount.map((_, index) => (
-          <div key={index} className="flex flex-col gap-2 pr-4 py-4">
+          <div key={index} className="flex flex-col gap-2 py-4 pr-4">
             <div className="flex items-center gap-2">
               <Skeleton className="h-6 w-6 rounded-full" />
               <Skeleton className="h-4 w-48 rounded-full" />
