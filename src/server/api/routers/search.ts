@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import type { OpenLibrarySearchResponse } from "~/types/open-library";
+import type { GoogleBooksAPIResponse } from "~/types/google-book";
 
-const baseURL = "https://openlibrary.org/search.json";
+const googleBooksURL = 'https://www.googleapis.com/books/v1/volumes'
 
 export const searchRouter = createTRPCRouter({
   findBook: protectedProcedure
@@ -15,16 +15,17 @@ export const searchRouter = createTRPCRouter({
       }),
     )
     .query(async ({ input }) => {
-        const books = await fetchWorks({query: input.query})
+        const books = await fetchBooks({query: input.query})
         return books
     }),
 });
 
-const fetchWorks = async ({ query }: { query: string }) => {
-  const search = `${baseURL}?q=${query}&_spellcheck_count=0&limit=10&fields=key,cover_i,title,subtitle,author_name,name&mode=everything`;
+const fetchBooks = async ({ query }: { query: string }) => {
+  const search = `${googleBooksURL}?q=${query}&maxResults=5&fields=items(volumeInfo, id)`;
   const res = await fetch(search, { cache: "force-cache" });
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const result: OpenLibrarySearchResponse  = await res.json();
+  const result: GoogleBooksAPIResponse = await res.json();
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return result;
 };

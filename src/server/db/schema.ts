@@ -119,7 +119,7 @@ export const chapters = createTable("chapter", {
   bookReadingId: integer("book_reading_id").notNull().references(() => bookReading.id)
 })
 
-export const chapterRelations = relations(chapters, ({ many, one }) => ({
+export const chapterRelations = relations(chapters, ({ many }) => ({
   readBy: many(chaptersReadBy)
 }));
 
