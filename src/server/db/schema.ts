@@ -8,6 +8,7 @@ import {
   serial,
   text,
   timestamp,
+  unique,
   varchar,
 } from "drizzle-orm/pg-core";
 import { type AdapterAccount } from "next-auth/adapters";
@@ -147,8 +148,12 @@ export const bookReading = createTable("book_reading", {
   id: serial("id").primaryKey(),
   current: boolean("current").default(false),
   name: varchar("name", { length: 255 }).notNull(),
-  clubId: integer("club_id").notNull().unique().references(() => clubs.id)
-})
+  bookId: varchar("book_id", {length: 255}),
+  coverUrl: varchar("cover_url", {length: 255}),
+  clubId: integer("club_id").notNull().references(() => clubs.id)
+}, (table) => ({
+  unq: unique('book-reading').on(table.name, table.clubId)
+}))
 
 export const bookReadingRelations = relations(bookReading, ({ many }) => ({
   chapters: many(chapters)

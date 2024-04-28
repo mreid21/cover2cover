@@ -11,18 +11,33 @@ export const clubRouter = createTRPCRouter({
     .input(z.object({ clubId: z.number() }))
     .query(({ ctx, input }) => {
       return ctx.db.query.bookReading.findFirst({
-        where: and(eq(bookReading.clubId, input.clubId), eq(bookReading.current, true))
-      })
+        where: and(
+          eq(bookReading.clubId, input.clubId),
+          eq(bookReading.current, true),
+        ),
+      });
     }),
   setCurrentlyReading: protectedProcedure
-    .input(z.object({ clubId: z.number(), name: z.string() }))
+    .input(
+      z.object({
+        clubId: z.number(),
+        name: z.string(),
+        bookId: z.string().optional(),
+        coverUrl: z.string().nullable(),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
       await ctx.db
-        .insert(bookReading)
-        .values({ clubId: input.clubId, name: input.name, current: true })
-        .onConflictDoNothing({
-          target: [bookReading.name, bookReading.clubId],
-        });
+        .update(bookReading)
+        .set({ current: false })
+        .where(
+          and(
+            eq(bookReading.current, true),
+            eq(bookReading.clubId, input.clubId),
+          ),
+        );
+
+      await ctx.db.insert(bookReading).values({ ...input, current: true });
     }),
   create: protectedProcedure
     .input(z.object({ name: z.string(), userId: z.string() }))

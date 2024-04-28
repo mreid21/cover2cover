@@ -3,6 +3,7 @@ import { api } from "~/trpc/server";
 import SearchInput from "../_components/search";
 import { Skeleton } from "../_components/ui/skeleton";
 import { Suspense } from "react";
+import { BookResult } from "../_components/book-result";
 
 export default async function BookSearch({
   searchParams,
@@ -23,12 +24,7 @@ export default async function BookSearch({
   );
 }
 
-type BookProps = {
-  id: string;
-  title: string;
-  coverImage?: string;
-  authors?: string[];
-};
+
 
 type BookSearchResultsProps = {
   query: string;
@@ -39,11 +35,11 @@ async function BookSearchResults({ query }: BookSearchResultsProps) {
   return (
     <div className="mx-auto my-2 grid max-w-max grid-cols-4 gap-4">
       {results.items?.map((volume) => (
-        <Book
+        <BookResult
           key={volume.id}
           id={volume.id}
           title={volume.volumeInfo.title}
-          coverImage={volume.volumeInfo.imageLinks?.thumbnail}
+          coverImage={volume.volumeInfo.imageLinks?.thumbnail ?? null}
           authors={volume.volumeInfo.authors}
         />
       ))}
@@ -64,16 +60,4 @@ function BookSearchResultsSkeleton() {
   );
 }
 
-async function Book({ title, coverImage }: BookProps) {
-  return (
-    <div className="flex flex-col gap-2">
-      {coverImage && (
-        <div className="h-[170px] w-[115px] rounded-md">
-          <img className="block h-full w-full" src={coverImage} alt="" />
-        </div>
-      )}
-      <span>{title}</span>
-      <div></div>
-    </div>
-  );
-}
+
