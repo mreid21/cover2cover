@@ -10,7 +10,6 @@ export const searchRouter = createTRPCRouter({
       z.object({
         query: z
           .string()
-          .min(1)
           .transform((q) => encodeURIComponent(q)),
       }),
     )
