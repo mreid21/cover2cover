@@ -6,21 +6,26 @@ import { Button } from "~/app/_components/ui/button";
 import { api } from "~/trpc/server";
 
 export default async function Club({ params }: { params: { slug: string } }) {
-  const currentlyReading = await api.clubs.currentReading({
-    clubId: parseInt(params.slug),
-  });
+  const club = await api.clubs
+    .overview({
+      clubId: parseInt(params.slug),
+    })
+  
 
   return (
-    <div className="mx-4 my-2 flex gap-4">
-      {currentlyReading ? (
+    <div className="mx-4 my-2 flex gap-2">
+      <h2>{}</h2>
+      {club?.currentlyReading ? (
         <div className="flex max-w-sm flex-col gap-2">
           <Book
-            readingId={currentlyReading.id}
-            id={currentlyReading.bookId}
-            title={currentlyReading.name}
-            coverImage={currentlyReading.coverUrl}
+            id={club.currentlyReading.id.toString()}
+            title={club.currentlyReading.name}
+            coverImage={club.currentlyReading.coverUrl}
           />
-          <AddChapters bookReadingId={currentlyReading.id} />
+          <Link href={`./${params.slug}/book?readingId=${club.currentlyReading.id}`}>
+            <Button variant="outline">Go To</Button>
+          </Link>
+          <AddChapters bookReadingId={club.currentlyReading.id} />
         </div>
       ) : (
         <Link href={`./${params.slug}/search-books`}>

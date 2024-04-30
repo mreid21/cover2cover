@@ -27,7 +27,7 @@ export default function CreateClub({ userId }: CreateClubProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <div className="flex w-full justify-start my-4">
+        <div className="flex justify-end my-4">
           <Button variant="default">Create Club</Button>
         </div>
       </DialogTrigger>

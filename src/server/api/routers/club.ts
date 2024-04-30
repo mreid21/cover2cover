@@ -46,4 +46,21 @@ export const clubRouter = createTRPCRouter({
         .insert(clubs)
         .values({ name: input.name, ownerId: input.userId });
     }),
+  overview: protectedProcedure
+    .input(z.object({ clubId: z.coerce.number() }))
+    .query(async ({ ctx, input }) => {
+      const club = await ctx.db.query.clubs.findFirst({
+        where: eq(clubs.id, input.clubId),
+        with: {
+          readings: true,
+        },
+      });
+
+      return {
+        ...club,
+        currentlyReading:
+          club?.readings.filter((reading) => reading.current === true)[0] ??
+          undefined,
+      };
+    }),
 });

@@ -163,6 +163,10 @@ export const bookReading = createTable("book_reading", {
   unq: unique('book-reading').on(table.name, table.clubId)
 }))
 
-export const bookReadingRelations = relations(bookReading, ({ many }) => ({
-  chapters: many(chapters)
+export const bookReadingRelations = relations(bookReading, ({ many, one }) => ({
+  chapters: many(chapters),
+  club: one(clubs, {
+    fields: [bookReading.clubId],
+    references: [clubs.id]
+  })
 }));

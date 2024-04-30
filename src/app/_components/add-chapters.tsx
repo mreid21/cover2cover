@@ -27,7 +27,7 @@ export default function AddChapters({ bookReadingId }: AddChaptersProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <div className="flex w-full justify-start my-4">
+        <div className="flex w-full justify-start">
           <Button variant="default">Add Chapters</Button>
         </div>
       </DialogTrigger>
