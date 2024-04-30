@@ -5,7 +5,7 @@ import { Button } from "./ui/button";
 import { Check } from "lucide-react";
 import Link from "next/link";
 import { api } from "~/trpc/react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 const chapterVariants = cva(
   "flex text-sm justify-between min-h-16 items-center shadow rounded-md p-4",
@@ -27,9 +27,10 @@ type ChapterProps = VariantProps<typeof chapterVariants> & {
 
 export function Chapter({ id, number, userId, locked = false }: ChapterProps) {
   const router = useRouter();
+  const params = useParams<{ slug: string }>();
   const { mutate: markChapter } = api.chapter.markRead.useMutation({
     onSuccess: () => {
-      router.refresh()
+      router.refresh();
     },
   });
 
@@ -41,7 +42,7 @@ export function Chapter({ id, number, userId, locked = false }: ChapterProps) {
 
   return (
     <Link
-      href={{pathname: './book/chapter', query: {id}}}
+      href={{ pathname: `./${params.slug}/chapter`, query: { id } }}
       aria-disabled={locked!}
       tabIndex={locked ? -1 : 0}
       className={chapterVariants({ locked })}
