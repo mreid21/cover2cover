@@ -19,12 +19,16 @@ export async function Navbar() {
             <Link className="rounded-md p-1.5 hover:bg-secondary" href="/">
               Home
             </Link>
+            <Link className="rounded-md p-1.5 hover:bg-secondary" href="/clubs/invite">
+              Invite to club
+            </Link>
             <Link
               className="rounded-md p-1.5 hover:bg-secondary"
               href={session ? "/api/auth/signout" : "/api/auth/signin"}
             >
               {session ? "Sign out" : "Sign in"}
             </Link>
+            
           </ul>
         </PopoverContent>
       </Popover>

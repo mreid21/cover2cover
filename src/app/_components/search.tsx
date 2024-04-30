@@ -4,11 +4,11 @@ import { Input } from "../_components/ui/input";
 import { usePathname, useRouter } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
 
-type SearchInputProps = {
+type SearchInputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'type'> & {
   debounce?: { duration: number };
   queryName?: string;
 };
-export default function SearchInput({ queryName = "q", debounce = {duration: 1000} }: SearchInputProps) {
+export default function SearchInput({ queryName = "q", debounce = {duration: 1000}, ...inputProps }: SearchInputProps) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -27,8 +27,8 @@ export default function SearchInput({ queryName = "q", debounce = {duration: 100
       <Input
         onChange={(e) => debouncedOnSearch(e.target.value)}
         className="px-8"
-        placeholder="search books"
         type="text"
+        {...inputProps}
       />
     </div>
   );
