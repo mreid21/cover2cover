@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, count, eq } from "drizzle-orm";
 import { chapters, chaptersReadBy } from "~/server/db/schema";
 
 export const chapterRouter = createTRPCRouter({
@@ -20,12 +20,14 @@ export const chapterRouter = createTRPCRouter({
         .where(eq(chapters.bookReadingId, input.bookReadingId))
         .orderBy(asc(chapters.number));
     }),
-  getMoments: protectedProcedure.input(z.object({chapterId: z.number()})).query(({ ctx, input }) => {
-    return ctx.db.query.chapters.findFirst({
-      where: eq(chapters.id, input.chapterId),
-      with: { moments: true },
-    });
-  }),
+  getMoments: protectedProcedure
+    .input(z.object({ chapterId: z.number() }))
+    .query(({ ctx, input }) => {
+      return ctx.db.query.chapters.findFirst({
+        where: eq(chapters.id, input.chapterId),
+        with: { moments: true },
+      });
+    }),
   addChapters: protectedProcedure
     .input(
       z.object({
@@ -34,9 +36,14 @@ export const chapterRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const existingChapters = await ctx.db
+        .select({ count: count() })
+        .from(chapters)
+        .where(eq(chapters.bookReadingId, input.bookReadingId));
+      const startIndex = existingChapters[0]?.count ?? 0;
       const chapterNumbers = new Array(input.numChapters)
         .fill(0)
-        .map((_, index) => index + 1);
+        .map((_, index) => startIndex + index + 1);
 
       await ctx.db.transaction(async (tx) => {
         for (const num of chapterNumbers) {
