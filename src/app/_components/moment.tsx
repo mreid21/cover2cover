@@ -2,6 +2,7 @@ import { Avatar, AvatarFallback } from "./ui/avatar";
 import { Ellipsis } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { api } from "~/trpc/react";
+import { util } from "zod";
 
 type MomentProps = {
   id: number;
@@ -9,13 +10,14 @@ type MomentProps = {
 };
 
 export function Moment({ id, content }: MomentProps) {
-  const utils = api.useUtils();
+  
+  const utils = api.useUtils()
 
   const { mutate: deleteMoment } = api.moment.delete.useMutation({
     onSuccess: () => utils.moment.getForChapter.invalidate(),
   });
   return (
-    <div className="max-w-fit min-w-[300px] rounded-xl border bg-card p-4 text-card-foreground">
+    <div className="w-full hover:bg-secondary rounded-xls bg-card p-4 text-card-foreground">
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
