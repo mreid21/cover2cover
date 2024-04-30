@@ -1,8 +1,8 @@
 "use client";
 import { api } from "~/trpc/react";
-import CreateMoment from "./create-moment";
 import { Moment } from "./moment";
 import { Skeleton } from "./ui/skeleton";
+import { Input } from "./ui/input";
 
 type MomentListProps = {
   chapterId: number;
@@ -12,12 +12,14 @@ export function MomentList({ chapterId }: MomentListProps) {
   const { data: chapterWithMoments, isLoading } =
     api.chapter.getMoments.useQuery({ chapterId });
   return (
-    <div className="flex max-w-[300px] flex-col gap-2 sm:max-w-[600px]">
-      <CreateMoment chapterId={chapterId} />
-      {isLoading && <MomentListSkeleton />}
-      {chapterWithMoments?.moments?.map((m) => (
-        <Moment id={m.id} content={m.content} key={m.id} />
-      ))}
+    <div className="flex max-w-[300px] h-[700px] flex-col gap-2 sm:max-w-[600px]">
+      <div className="flex-1 border p-4 overflow-y-auto">
+        {isLoading && <MomentListSkeleton />}
+        {chapterWithMoments?.moments?.map((m) => (
+          <Moment id={m.id} content={m.content} key={m.id} />
+        ))}
+      </div>
+      <Input/>
     </div>
   );
 }

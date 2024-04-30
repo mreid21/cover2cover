@@ -1,9 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
 import { api } from "~/trpc/server";
-import SearchInput from "../../../_components/search";
 import { Skeleton } from "../../../_components/ui/skeleton";
 import { Suspense } from "react";
 import { BookResult } from "../../../_components/book-result";
+import SearchInput from "~/app/_components/search-input";
 
 export default async function BookSearch({
   searchParams,

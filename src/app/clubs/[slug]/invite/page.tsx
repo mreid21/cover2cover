@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import SearchInput from "~/app/_components/search";
+import SearchInput from "~/app/_components/search-input";
 import { api } from "~/trpc/server";
 
 export default async function ClubInvitePage({
@@ -36,7 +36,7 @@ type UserResultsItem = {
   name: string;
 };
 
-function UserResultsItem({ id, name }: UserResultsItem) {
+function UserResultsItem({ name }: UserResultsItem) {
   return (
     <div className="flex flex items-center gap-4 rounded-md p-2 hover:bg-secondary cursor-pointer">
       <div className="h-6 w-6 rounded-full bg-secondary"></div>

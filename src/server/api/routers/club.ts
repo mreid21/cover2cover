@@ -1,21 +1,26 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { bookReading, clubs } from "~/server/db/schema";
+import { bookReading, clubs, usersToClubs } from "~/server/db/schema";
 import { and, eq } from "drizzle-orm";
+import type { TRPCServerContext } from "~/trpc/server";
 
 export const clubRouter = createTRPCRouter({
   getAll: protectedProcedure.query(({ ctx }) => {
     return ctx.db.query.clubs.findMany();
   }),
+  addMember: protectedProcedure
+    .input(z.object({ userId: z.string(), clubId: z.number() }))
+    .mutation(async ({ ctx, input }) => {
+      await addMember(ctx.db, {
+        userId: input.userId,
+        clubId: input.clubId,
+        isOwner: false,
+      });
+    }),
   currentReading: protectedProcedure
     .input(z.object({ clubId: z.number() }))
     .query(({ ctx, input }) => {
-      return ctx.db.query.bookReading.findFirst({
-        where: and(
-          eq(bookReading.clubId, input.clubId),
-          eq(bookReading.current, true),
-        ),
-      });
+      return getCurrentlyReading(ctx.db, { clubId: input.clubId });
     }),
   setCurrentlyReading: protectedProcedure
     .input(
@@ -42,9 +47,16 @@ export const clubRouter = createTRPCRouter({
   create: protectedProcedure
     .input(z.object({ name: z.string(), userId: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      await ctx.db
+      const result = await ctx.db
         .insert(clubs)
-        .values({ name: input.name, ownerId: input.userId });
+        .values({ name: input.name, ownerId: input.userId })
+        .returning({ id: clubs.id });
+
+      await addMember(ctx.db, {
+        userId: input.userId,
+        clubId: result[0]!.id,
+        isOwner: true,
+      });
     }),
   overview: protectedProcedure
     .input(z.object({ clubId: z.coerce.number() }))
@@ -53,14 +65,45 @@ export const clubRouter = createTRPCRouter({
         where: eq(clubs.id, input.clubId),
         with: {
           readings: true,
+          usersToClubs: {
+            limit: 5,
+            with: {
+              user: {
+                columns: { id: true, name: true, image: true },
+              },
+            },
+          },
         },
+      });
+
+      const currentlyReading = await getCurrentlyReading(ctx.db, {
+        clubId: input.clubId,
       });
 
       return {
         ...club,
-        currentlyReading:
-          club?.readings.filter((reading) => reading.current === true)[0] ??
-          undefined,
+        currentlyReading,
       };
     }),
 });
+
+const addMember = async (
+  db: TRPCServerContext["db"],
+  args: { userId: string; clubId: number; isOwner: boolean },
+) => {
+  await db
+    .insert(usersToClubs)
+    .values({ userId: args.userId, clubId: args.clubId });
+};
+
+const getCurrentlyReading = async (
+  db: TRPCServerContext["db"],
+  args: { clubId: number },
+) => {
+  return db.query.bookReading.findFirst({
+    where: and(
+      eq(bookReading.clubId, args.clubId),
+      eq(bookReading.current, true),
+    ),
+  });
+};

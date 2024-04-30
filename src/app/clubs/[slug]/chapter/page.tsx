@@ -11,7 +11,7 @@ export default async function Chapter({
   if (!chapterId) redirect('/books')
 
   return (
-    <main className="mx-4 my-2 min-h-screen">
+    <main className="mx-4 my-2 h-full">
       <h3 className="mb-4 text-2xl font-semibold">
         Chapter
       </h3>

@@ -15,7 +15,7 @@ export default function SearchInput({ queryName = "q", debounce = {duration: 100
   const debouncedOnSearch = useDebouncedCallback((term: string) => {
     const params = new URLSearchParams();
     term ? params.set(queryName, term) : params.delete(queryName);
-    router.replace(`${pathname}?${params.toString()}`);
+    router.replace(`${pathname}?${params.toString()}`)
   }, debounce.duration);
 
   return (

@@ -16,7 +16,6 @@ export function Book({ title, coverImage }: BookProps) {
             <img className="block h-full w-full" src={coverImage} alt="" />
           </div>
         )}
-        <span>{title}</span>
       </div>
   );
 }

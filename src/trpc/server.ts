@@ -19,4 +19,6 @@ const createContext = cache(() => {
   });
 });
 
+export type TRPCServerContext = Awaited<ReturnType<typeof createContext>>
+
 export const api = createCaller(createContext);

@@ -19,8 +19,8 @@ export async function Navbar() {
             <Link className="rounded-md p-1.5 hover:bg-secondary" href="/">
               Home
             </Link>
-            <Link className="rounded-md p-1.5 hover:bg-secondary" href="/clubs/invite">
-              Invite to club
+            <Link className="rounded-md p-1.5 hover:bg-secondary" href="/invites">
+              Invites
             </Link>
             <Link
               className="rounded-md p-1.5 hover:bg-secondary"

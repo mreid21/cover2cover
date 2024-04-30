@@ -15,7 +15,7 @@ export function Moment({ id, content }: MomentProps) {
     onSuccess: () => utils.moment.getForChapter.invalidate(),
   });
   return (
-    <div className="max-w-fit min-w-[300px] rounded-xl border bg-card p-4 text-card-foreground shadow">
+    <div className="max-w-fit min-w-[300px] rounded-xl border bg-card p-4 text-card-foreground">
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">

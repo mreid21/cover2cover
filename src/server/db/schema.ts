@@ -34,7 +34,7 @@ export const users = createTable("user", {
 export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
   chaptersRead: many(chaptersReadBy),
-  clubs: many(clubs)
+  usersToClubs: many(usersToClubs)
 }));
 
 export const accounts = createTable(
@@ -149,7 +149,8 @@ export const clubs = createTable("club", {
 });
 
 export const clubRelations = relations(clubs, ({many}) => ({
-  readings: many(bookReading)
+  readings: many(bookReading),
+  usersToClubs: many(usersToClubs)
 }))
 
 export const bookReading = createTable("book_reading", {
@@ -169,4 +170,25 @@ export const bookReadingRelations = relations(bookReading, ({ many, one }) => ({
     fields: [bookReading.clubId],
     references: [clubs.id]
   })
+}));
+
+
+
+export const usersToClubs = createTable('users_to_clubs', {
+  clubId: integer('club_id').notNull().references(() => clubs.id),
+  userId: varchar('user_id', {length: 255}).notNull().references(() => users.id),
+  owner: boolean('owner').notNull().default(false)
+}, (table) => ({
+  pk: primaryKey({columns: [table.clubId, table.userId]})
+}))
+
+export const usersToClubsRelations = relations(usersToClubs, ({ one }) => ({
+  club: one(clubs, {
+    fields: [usersToClubs.clubId],
+    references: [clubs.id],
+  }),
+  user: one(users, {
+    fields: [usersToClubs.userId],
+    references: [users.id],
+  }),
 }));
