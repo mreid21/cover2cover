@@ -12,9 +12,11 @@ export const inviteSchema = z.object({
 });
 
 export const clubRouter = createTRPCRouter({
-  getAll: protectedProcedure.query(({ ctx }) => {
-    return ctx.db.query.clubs.findMany();
-  }),
+  getClubs: protectedProcedure
+    .input(z.object({ userId: z.string() }))
+    .query(({ ctx, input }) => {
+      return ctx.db.query.usersToClubs.findMany({where: eq(usersToClubs.userId, input.userId), with: {club: true}})
+    }),
   addMember: protectedProcedure
     .input(z.object({ userId: z.string(), clubId: z.number() }))
     .mutation(async ({ ctx, input }) => {
@@ -78,7 +80,6 @@ export const clubRouter = createTRPCRouter({
   join: protectedProcedure
     .input(z.object({ token: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const origin = ctx.headers.get("origin");
       const decoded = inviteSchema.parse(jwt.decode(input.token));
 
       //todo: handle expiration
@@ -88,8 +89,7 @@ export const clubRouter = createTRPCRouter({
         isOwner: false,
       });
 
-      return `/clubs/${decoded.clubId}`
-
+      return `/clubs/${decoded.clubId}`;
     }),
   overview: protectedProcedure
     .input(z.object({ clubId: z.coerce.number() }))

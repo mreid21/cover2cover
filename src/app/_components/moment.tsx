@@ -2,14 +2,14 @@ import { Avatar, AvatarFallback } from "./ui/avatar";
 import { Ellipsis } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { api } from "~/trpc/react";
-import { util } from "zod";
 
 type MomentProps = {
   id: number;
+  username: string
   content: string;
 };
 
-export function Moment({ id, content }: MomentProps) {
+export function Moment({ id, content, username }: MomentProps) {
   
   const utils = api.useUtils()
 
@@ -24,7 +24,7 @@ export function Moment({ id, content }: MomentProps) {
             <Avatar size="sm">
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
-            <span>usernameugh</span>
+            <span>{username}</span>
           </div>
           <Popover>
             <PopoverTrigger>

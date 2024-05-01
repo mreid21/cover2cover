@@ -4,6 +4,9 @@ import { and, asc, count, eq } from "drizzle-orm";
 import { chapterNote, chapters, chaptersReadBy } from "~/server/db/schema";
 
 export const chapterRouter = createTRPCRouter({
+  byId: protectedProcedure.input(z.object({id: z.coerce.number()})).query(({ctx, input}) => {
+    return ctx.db.query.chapters.findFirst({where: eq(chapters.id, input.id), columns: {number: true, id: true}})
+  }),
   getAll: protectedProcedure
     .input(z.object({ userId: z.string(), bookReadingId: z.coerce.number() }))
     .query(({ ctx, input }) => {
@@ -25,7 +28,7 @@ export const chapterRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const chapter = await ctx.db.query.chapters.findFirst({
         where: eq(chapters.id, input.chapterId),
-        with: { moments: true },
+        with: { moments: {with: {author: true}} },
       });
 
       const note = await ctx.db.query.chapterNote.findFirst({

@@ -4,7 +4,7 @@ import {
   useEditor,
   EditorContent,
   type EditorOptions,
-  Content,
+  type Content,
 } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useDebouncedCallback } from "use-debounce";
@@ -28,7 +28,7 @@ export default function TextComposer({
     onUpdate: debouncedOnUpdate,
     editorProps: {
       attributes: {
-        class: "prose focus:outline-none",
+        class: "prose prose-p:m-0 prose-p:leading-6 focus:outline-none",
       },
     },
   });

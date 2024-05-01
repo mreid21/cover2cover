@@ -9,7 +9,6 @@ import {
   text,
   timestamp,
   unique,
-  uuid,
   varchar,
 } from "drizzle-orm/pg-core";
 import { type AdapterAccount } from "next-auth/adapters";
@@ -105,9 +104,9 @@ export const verificationTokens = createTable(
 export const moments = createTable("moments", {
   id: serial("id").primaryKey(),
   content: text("content").notNull(),
-  createdById: varchar("createdById", { length: 255 }).references(
-    () => users.id,
-  ),
+  createdById: varchar("createdById", { length: 255 })
+    .notNull()
+    .references(() => users.id),
   createdAt: timestamp("created_at")
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
@@ -118,6 +117,10 @@ export const moments = createTable("moments", {
 });
 
 export const momentRelations = relations(moments, ({ one }) => ({
+  author: one(users, {
+    fields: [moments.createdById],
+    references: [users.id]
+  }),
   chapter: one(chapters, {
     fields: [moments.chapterId],
     references: [chapters.id],
@@ -129,10 +132,10 @@ export const chapters = createTable("chapter", {
   number: integer("number").notNull(),
   bookReadingId: integer("book_reading_id")
     .notNull()
-    .references(() => bookReading.id),
+    .references(() => bookReading.id, { onDelete: "cascade" }),
 });
 
-export const chapterRelations = relations(chapters, ({ many, one }) => ({
+export const chapterRelations = relations(chapters, ({ many }) => ({
   readBy: many(chaptersReadBy),
   moments: many(moments),
   notes: many(chapterNote),
@@ -194,7 +197,7 @@ export const bookReading = createTable(
     coverUrl: varchar("cover_url", { length: 255 }),
     clubId: integer("club_id")
       .notNull()
-      .references(() => clubs.id),
+      .references(() => clubs.id, { onDelete: "cascade" }),
   },
   (table) => ({
     unq: unique("book-reading").on(table.name, table.clubId),

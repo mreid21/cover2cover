@@ -1,19 +1,19 @@
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import {
-  createTRPCRouter,
-  publicProcedure,
-} from "~/server/api/trpc";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "~/server/api/trpc";
 import { moments } from "~/server/db/schema";
 
 export const momentRouter = createTRPCRouter({
-  create: publicProcedure
-    .input(z.object({ chapterId: z.coerce.number(), content: z.string().min(1) }))
+  create: protectedProcedure
+    .input(
+      z.object({ chapterId: z.coerce.number(), content: z.string().min(1) }),
+    )
     .mutation(async ({ ctx, input }) => {
       // simulate a slow db call
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       await ctx.db.insert(moments).values({
+        createdById: ctx.session.user.id,
         chapterId: input.chapterId,
         content: input.content,
       });

@@ -13,8 +13,10 @@ type MomentListProps = {
 
 export function MomentList({ chapterId, userId }: MomentListProps) {
   const utils = api.useUtils();
-  const { data: chapterOverview, isLoading } =
-    api.chapter.getMoments.useQuery({ chapterId, userId });
+  const { data: chapterOverview, isLoading } = api.chapter.getMoments.useQuery({
+    chapterId,
+    userId,
+  });
 
   const { mutate: createMoment, isPending } = api.moment.create.useMutation({
     onSuccess: async () => {
@@ -35,11 +37,17 @@ export function MomentList({ chapterId, userId }: MomentListProps) {
         <div className="flex-1 overflow-y-auto p-4 text-sm">
           {isLoading && <MomentListSkeleton />}
           {chapterOverview?.moments?.map((m) => (
-            <Moment id={m.id} content={m.content} key={m.id} />
+            <Moment
+              id={m.id}
+              username={m.author.name ?? "anon"}
+              content={m.content}
+              key={m.id}
+            />
           ))}
         </div>
         {isPending && <span>loading..</span>}
         <Input
+          placeholder="Type your comment"
           onKeyDown={(e) => {
             if (e.key === "Enter" && momentText.length > 0) {
               createMoment({ content: momentText, chapterId });
@@ -50,16 +58,18 @@ export function MomentList({ chapterId, userId }: MomentListProps) {
       </div>
 
       <div className="h-full flex-1 border">
-        {chapterOverview && <TextComposer
-          initialContent={chapterOverview.note?.content ?? undefined}
-          onUpdate={({ editor }) =>
-            updateNote({
-              userId,
-              chapterId,
-              content: JSON.stringify(editor.getJSON()),
-            })
-          }
-        />}
+        {chapterOverview && (
+          <TextComposer
+            initialContent={chapterOverview.note?.content ?? undefined}
+            onUpdate={({ editor }) =>
+              updateNote({
+                userId,
+                chapterId,
+                content: JSON.stringify(editor.getJSON()),
+              })
+            }
+          />
+        )}
       </div>
     </div>
   );

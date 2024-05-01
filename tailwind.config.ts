@@ -18,6 +18,17 @@ const config = {
       },
     },
     extend: {
+      typography: {
+        DEFAULT: {
+          css: {
+            color: '#333',
+            blockquote: {
+              margin: 0
+            },
+          },
+        },
+      },
+
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
