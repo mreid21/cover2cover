@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import AddChapters from "~/app/_components/add-chapters";
 import { Book } from "~/app/_components/book";
 import { Chapter } from "~/app/_components/chapter";
+import InviteLinkGenerator from "~/app/_components/invite-link-generator";
 import { Button } from "~/app/_components/ui/button";
 import { cn } from "~/lib/utils";
 import { getServerAuthSession } from "~/server/auth";
@@ -33,11 +34,7 @@ export default async function Club({ params }: { params: { slug: string } }) {
                 {club.usersToClubs?.length === 1 ? "member" : "members"}
               </span>
             </div>
-            <Link href={`./${8}/invite`}>
-              <Button className="w-full" variant="outline">
-                Invite
-              </Button>
-            </Link>
+            <InviteLinkGenerator clubId={parseInt(params.slug)}/> 
             <AddChapters bookReadingId={club.currentlyReading.id} />
           </div>
           <Suspense fallback={<span>loading..</span>}>
@@ -110,3 +107,4 @@ function MemberStack({
     </div>
   );
 }
+

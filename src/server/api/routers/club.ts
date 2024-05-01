@@ -1,8 +1,9 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { bookReading, clubs, usersToClubs } from "~/server/db/schema";
+import { bookReading, clubs, invites, usersToClubs } from "~/server/db/schema";
 import { and, eq } from "drizzle-orm";
 import type { TRPCServerContext } from "~/trpc/server";
+import jwt from "jsonwebtoken";
 
 export const clubRouter = createTRPCRouter({
   getAll: protectedProcedure.query(({ ctx }) => {
@@ -58,6 +59,23 @@ export const clubRouter = createTRPCRouter({
         isOwner: true,
       });
     }),
+  invite: protectedProcedure
+    .input(z.object({ clubId: z.coerce.number() }))
+    .mutation(async ({ input, ctx }) => {
+      const origin = ctx.headers.get("origin");
+      const link = await generateInvite(ctx.db, {
+        clubId: input.clubId,
+        origin: origin!,
+      });
+      return link;
+    }),
+  join: protectedProcedure
+    .input(z.object({ token: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      return ctx.db.query.invites.findFirst({
+        where: eq(invites.token, input.token),
+      });
+    }),
   overview: protectedProcedure
     .input(z.object({ clubId: z.coerce.number() }))
     .query(async ({ ctx, input }) => {
@@ -87,6 +105,28 @@ export const clubRouter = createTRPCRouter({
     }),
 });
 
+const generateInvite = async (
+  db: TRPCServerContext["db"],
+  args: { clubId: number; origin: string },
+): Promise<string> => {
+  const exp = Math.floor(Date.now() / 1000) + 60 * 10;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+  const token: string = jwt.sign(
+    {
+      clubId: args.clubId,
+      exp,
+    },
+    "12443",
+  );
+
+  const link = `${args.origin}/invite?token=${token}`;
+
+  await db
+    .insert(invites)
+    .values({ token, link, expiration: exp, clubId: args.clubId });
+
+  return link;
+};
 const addMember = async (
   db: TRPCServerContext["db"],
   args: { userId: string; clubId: number; isOwner: boolean },

@@ -9,6 +9,7 @@ import {
   text,
   timestamp,
   unique,
+  uuid,
   varchar,
 } from "drizzle-orm/pg-core";
 import { type AdapterAccount } from "next-auth/adapters";
@@ -34,7 +35,7 @@ export const users = createTable("user", {
 export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
   chaptersRead: many(chaptersReadBy),
-  usersToClubs: many(usersToClubs)
+  usersToClubs: many(usersToClubs),
 }));
 
 export const accounts = createTable(
@@ -102,7 +103,7 @@ export const verificationTokens = createTable(
 
 export const moments = createTable("moments", {
   id: serial("id").primaryKey(),
-  content: text('content').notNull(),
+  content: text("content").notNull(),
   createdById: varchar("createdById", { length: 255 }).references(
     () => users.id,
   ),
@@ -110,7 +111,9 @@ export const moments = createTable("moments", {
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
   updatedAt: timestamp("updatedAt"),
-  chapterId: integer('chapter_id').references(() => chapters.id).notNull()
+  chapterId: integer("chapter_id")
+    .references(() => chapters.id)
+    .notNull(),
 });
 
 export const momentRelations = relations(moments, ({ one }) => ({
@@ -120,67 +123,89 @@ export const momentRelations = relations(moments, ({ one }) => ({
   }),
 }));
 
-
 export const chapters = createTable("chapter", {
-  id: serial('id').primaryKey().notNull(),
-  number: integer('number').notNull(),
-  bookReadingId: integer("book_reading_id").notNull().references(() => bookReading.id)
-})
+  id: serial("id").primaryKey().notNull(),
+  number: integer("number").notNull(),
+  bookReadingId: integer("book_reading_id")
+    .notNull()
+    .references(() => bookReading.id),
+});
 
 export const chapterRelations = relations(chapters, ({ many }) => ({
   readBy: many(chaptersReadBy),
-  moments: many(moments)
+  moments: many(moments),
 }));
 
-export const chaptersReadBy = createTable("chapters_read_by", {
-  chapterId: integer("chapter_id").notNull().references(() => chapters.id),
-  userId: varchar("user_id", {length: 255}).notNull().references(() => users.id),
-}, (table) => {
-  return {
-    pk: primaryKey({ columns: [table.chapterId, table.userId] }),
-  };
-});
-
+export const chaptersReadBy = createTable(
+  "chapters_read_by",
+  {
+    chapterId: integer("chapter_id")
+      .notNull()
+      .references(() => chapters.id),
+    userId: varchar("user_id", { length: 255 })
+      .notNull()
+      .references(() => users.id),
+  },
+  (table) => {
+    return {
+      pk: primaryKey({ columns: [table.chapterId, table.userId] }),
+    };
+  },
+);
 
 export const clubs = createTable("club", {
   id: serial("id").primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
-  ownerId: varchar("ownerId", {length: 255}).notNull().references(() => users.id)
+  ownerId: varchar("ownerId", { length: 255 })
+    .notNull()
+    .references(() => users.id),
 });
 
-export const clubRelations = relations(clubs, ({many}) => ({
+export const clubRelations = relations(clubs, ({ many }) => ({
   readings: many(bookReading),
-  usersToClubs: many(usersToClubs)
-}))
+  usersToClubs: many(usersToClubs),
+}));
 
-export const bookReading = createTable("book_reading", {
-  id: serial("id").primaryKey(),
-  current: boolean("current").default(false),
-  name: varchar("name", { length: 255 }).notNull(),
-  bookId: varchar("book_id", {length: 255}),
-  coverUrl: varchar("cover_url", {length: 255}),
-  clubId: integer("club_id").notNull().references(() => clubs.id)
-}, (table) => ({
-  unq: unique('book-reading').on(table.name, table.clubId)
-}))
+export const bookReading = createTable(
+  "book_reading",
+  {
+    id: serial("id").primaryKey(),
+    current: boolean("current").default(false),
+    name: varchar("name", { length: 255 }).notNull(),
+    bookId: varchar("book_id", { length: 255 }),
+    coverUrl: varchar("cover_url", { length: 255 }),
+    clubId: integer("club_id")
+      .notNull()
+      .references(() => clubs.id),
+  },
+  (table) => ({
+    unq: unique("book-reading").on(table.name, table.clubId),
+  }),
+);
 
 export const bookReadingRelations = relations(bookReading, ({ many, one }) => ({
   chapters: many(chapters),
   club: one(clubs, {
     fields: [bookReading.clubId],
-    references: [clubs.id]
-  })
+    references: [clubs.id],
+  }),
 }));
 
-
-
-export const usersToClubs = createTable('users_to_clubs', {
-  clubId: integer('club_id').notNull().references(() => clubs.id),
-  userId: varchar('user_id', {length: 255}).notNull().references(() => users.id),
-  owner: boolean('owner').notNull().default(false)
-}, (table) => ({
-  pk: primaryKey({columns: [table.clubId, table.userId]})
-}))
+export const usersToClubs = createTable(
+  "users_to_clubs",
+  {
+    clubId: integer("club_id")
+      .notNull()
+      .references(() => clubs.id),
+    userId: varchar("user_id", { length: 255 })
+      .notNull()
+      .references(() => users.id),
+    owner: boolean("owner").notNull().default(false),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.clubId, table.userId] }),
+  }),
+);
 
 export const usersToClubsRelations = relations(usersToClubs, ({ one }) => ({
   club: one(clubs, {
@@ -192,3 +217,13 @@ export const usersToClubsRelations = relations(usersToClubs, ({ one }) => ({
     references: [users.id],
   }),
 }));
+
+export const invites = createTable("invites", {
+  token: varchar("token", { length: 255 }).notNull().primaryKey(),
+  link: text("link").notNull().unique(),
+  issued: integer("issued")
+    .notNull()
+    .default(sql`extract(epoch from now())`),
+  clubId: integer('club_id').notNull().references(() => clubs.id),
+  expiration: integer("expiration").notNull(),
+});
