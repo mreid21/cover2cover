@@ -36,6 +36,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
   chaptersRead: many(chaptersReadBy),
   usersToClubs: many(usersToClubs),
+  chapterNotes: many(chapterNote),
 }));
 
 export const accounts = createTable(
@@ -131,10 +132,27 @@ export const chapters = createTable("chapter", {
     .references(() => bookReading.id),
 });
 
-export const chapterRelations = relations(chapters, ({ many }) => ({
+export const chapterRelations = relations(chapters, ({ many, one }) => ({
   readBy: many(chaptersReadBy),
   moments: many(moments),
+  notes: many(chapterNote),
 }));
+
+export const chapterNote = createTable(
+  "chaper_notes",
+  {
+    content: text("content"),
+    chapterId: integer("chapter_id")
+      .notNull()
+      .references(() => chapters.id),
+    userId: varchar("user_id", { length: 255 })
+      .notNull()
+      .references(() => users.id),
+  },
+  (table) => ({
+    pk: primaryKey({ columns: [table.userId, table.chapterId] }),
+  }),
+);
 
 export const chaptersReadBy = createTable(
   "chapters_read_by",
@@ -224,6 +242,8 @@ export const invites = createTable("invites", {
   issued: integer("issued")
     .notNull()
     .default(sql`extract(epoch from now())`),
-  clubId: integer('club_id').notNull().references(() => clubs.id),
+  clubId: integer("club_id")
+    .notNull()
+    .references(() => clubs.id),
   expiration: integer("expiration").notNull(),
 });

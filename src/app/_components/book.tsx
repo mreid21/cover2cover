@@ -8,7 +8,7 @@ export interface BookProps {
   authors?: string[];
 }
 
-export function Book({ title, coverImage }: BookProps) {
+export function Book({ coverImage }: BookProps) {
   return (
       <div className="flex flex-col gap-2">
         {coverImage && (

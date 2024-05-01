@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { and, asc, count, eq } from "drizzle-orm";
-import { chapters, chaptersReadBy } from "~/server/db/schema";
+import { chapterNote, chapters, chaptersReadBy } from "~/server/db/schema";
 
 export const chapterRouter = createTRPCRouter({
   getAll: protectedProcedure
@@ -21,12 +21,45 @@ export const chapterRouter = createTRPCRouter({
         .orderBy(asc(chapters.number));
     }),
   getMoments: protectedProcedure
-    .input(z.object({ chapterId: z.number() }))
-    .query(({ ctx, input }) => {
-      return ctx.db.query.chapters.findFirst({
+    .input(z.object({ chapterId: z.number(), userId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const chapter = await ctx.db.query.chapters.findFirst({
         where: eq(chapters.id, input.chapterId),
         with: { moments: true },
       });
+
+      const note = await ctx.db.query.chapterNote.findFirst({
+        columns: {
+          content: true
+        },
+        where: and(
+          eq(chapterNote.userId, input.userId),
+          eq(chapterNote.chapterId, input.chapterId),
+        ),
+      });
+
+      return {...chapter, note}
+    }),
+  updateNote: protectedProcedure
+    .input(
+      z.object({
+        content: z.string(),
+        userId: z.string(),
+        chapterId: z.number(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db
+        .insert(chapterNote)
+        .values({
+          chapterId: input.chapterId,
+          userId: input.userId,
+          content: input.content,
+        })
+        .onConflictDoUpdate({
+          target: [chapterNote.chapterId, chapterNote.userId],
+          set: { content: input.content },
+        });
     }),
   addChapters: protectedProcedure
     .input(
