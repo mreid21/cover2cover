@@ -5,6 +5,12 @@ import { and, eq } from "drizzle-orm";
 import type { TRPCServerContext } from "~/trpc/server";
 import jwt from "jsonwebtoken";
 
+export const inviteSchema = z.object({
+  clubId: z.coerce.number(),
+  exp: z.coerce.number(),
+  iat: z.coerce.number(),
+});
+
 export const clubRouter = createTRPCRouter({
   getAll: protectedProcedure.query(({ ctx }) => {
     return ctx.db.query.clubs.findMany();
@@ -72,9 +78,18 @@ export const clubRouter = createTRPCRouter({
   join: protectedProcedure
     .input(z.object({ token: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      return ctx.db.query.invites.findFirst({
-        where: eq(invites.token, input.token),
+      const origin = ctx.headers.get("origin");
+      const decoded = inviteSchema.parse(jwt.decode(input.token));
+
+      //todo: handle expiration
+      await addMember(ctx.db, {
+        userId: ctx.session.user.id,
+        clubId: decoded.clubId,
+        isOwner: false,
       });
+
+      return `/clubs/${decoded.clubId}`
+
     }),
   overview: protectedProcedure
     .input(z.object({ clubId: z.coerce.number() }))
