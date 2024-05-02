@@ -17,7 +17,7 @@ export function Moment({ id, content, username }: MomentProps) {
     onSuccess: () => utils.moment.getForChapter.invalidate(),
   });
   return (
-    <div className="w-full hover:bg-secondary rounded-xls bg-card p-4 text-card-foreground">
+    <div className="w-full bg-secondary rounded-xls bg-card p-4 text-card-foreground">
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">

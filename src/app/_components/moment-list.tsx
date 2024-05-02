@@ -33,8 +33,9 @@ export function MomentList({ chapterId, userId }: MomentListProps) {
 
   return (
     <div className="flex h-[75vh] w-screen gap-4 p-4">
-      <div className="flex flex-1 flex-col gap-2">
-        <div className="flex-1 overflow-y-auto p-4 text-sm">
+      <div className="flex flex-1 flex-col">
+        <p className="text-xl font-semibold">PUBLIC COMMENTS</p>
+        <div className="flex-1 flex flex-col gap-2 overflow-y-auto p-4 text-sm">
           {isLoading && <MomentListSkeleton />}
           {chapterOverview?.moments?.map((m) => (
             <Moment
@@ -57,7 +58,8 @@ export function MomentList({ chapterId, userId }: MomentListProps) {
         />
       </div>
 
-      <div className="h-full flex-1 border">
+      <div className="h-full flex-1 gap-2">
+        <p className="text-xl font-semibold">PRIVATE THOUGHTS</p>
         {chapterOverview && (
           <TextComposer
             initialContent={chapterOverview.note?.content ?? undefined}
